@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | RentEase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      font-family:'Poppins',sans-serif;
+      height:100vh;
+      display:flex;align-items:center;justify-content:center;
+      position:relative;overflow:hidden;
+    }
+    body::before{
+      content:'';position:absolute;top:0;left:0;width:100%;height:100%;
+      background:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1740&q=80') no-repeat center center/cover;
+      filter:blur(8px) brightness(0.8);z-index:-1;
+    }
+    .wrapper{
+      background:rgba(255,255,255,0.12);
+      backdrop-filter:blur(15px);
+      border-radius:20px;
+      box-shadow:0 0 30px rgba(0,0,0,0.3);
+      width:380px;padding:2rem;
+      color:#fff;text-align:center;
+    }
+    h2{font-weight:600;margin-bottom:1.5rem;}
+    .tabs{display:flex;justify-content:space-between;margin-bottom:1rem;}
+    .tabs button{
+      flex:1;padding:10px;border:none;cursor:pointer;
+      background:transparent;color:#fff;font-weight:600;
+      border-bottom:2px solid transparent;transition:.3s;
+    }
+    .tabs button.active{border-bottom:2px solid #fff;color:#fff;}
+    form{display:flex;flex-direction:column;gap:12px;margin-top:1rem;}
+    input,select{
+      padding:10px;border:none;border-radius:8px;font-size:15px;
+      outline:none;background:rgba(255,255,255,0.9);
+    }
+    .extras{display:flex;justify-content:space-between;font-size:13px;color:#eee;align-items:center;}
+    .extras a{color:#fff;text-decoration:none;}
+    button.submit{
+      background:#fff;color:#0b61ff;border:none;border-radius:8px;
+      padding:10px;font-weight:600;cursor:pointer;transition:.3s;
+    }
+    button.submit:hover{background:#0b61ff;color:#fff;}
+    .hidden{display:none;}
+    p.bottom-text{font-size:13px;margin-top:1rem;}
+    p.bottom-text a{color:#fff;font-weight:600;text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h2>Welcome to RentEase</h2>
+
+    <div class="tabs">
+      <button id="loginTab" class="active">Login</button>
+      <button id="signupTab">Sign Up</button>
+    </div>
+
+    <form id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPass" placeholder="Password" required>
+      <select id="loginRole" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="owner">Owner</option>
+        <option value="renter">Renter</option>
+      </select>
+      <div class="extras">
+        <label><input type="checkbox"> Remember me</label>
+        <a href="#">Forgot Password?</a>
+      </div>
+      <button type="submit" class="submit">Login</button>
+      <p class="bottom-text">Don't have an account? <a id="switchToSignup">Register</a></p>
+    </form>
+
+    <form id="signupForm" class="hidden">
+      <input type="text" id="signupName" placeholder="Full Name" required>
+      <input type="email" id="signupEmail" placeholder="Email" required>
+      <input type="password" id="signupPass" placeholder="Password" required>
+      <select id="signupRole" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="owner">Owner</option>
+        <option value="renter">Renter</option>
+      </select>
+      <button type="submit" class="submit">Sign Up</button>
+      <p class="bottom-text">Already have an account? <a id="switchToLogin">Login</a></p>
+    </form>
+  </div>
+
+  <script>
+    const loginTab=document.getElementById("loginTab"),
+          signupTab=document.getElementById("signupTab"),
+          loginForm=document.getElementById("loginForm"),
+          signupForm=document.getElementById("signupForm"),
+          switchToSignup=document.getElementById("switchToSignup"),
+          switchToLogin=document.getElementById("switchToLogin");
+
+    loginTab.addEventListener("click",()=>showLogin());
+    signupTab.addEventListener("click",()=>showSignup());
+    switchToSignup.addEventListener("click",()=>showSignup());
+    switchToLogin.addEventListener("click",()=>showLogin());
+
+    function showLogin(){
+      loginTab.classList.add("active");
+      signupTab.classList.remove("active");
+      loginForm.classList.remove("hidden");
+      signupForm.classList.add("hidden");
+    }
+
+    function showSignup(){
+      signupTab.classList.add("active");
+      loginTab.classList.remove("active");
+      signupForm.classList.remove("hidden");
+      loginForm.classList.add("hidden");
+    }
+
+    signupForm.addEventListener("submit",(e)=>{
+      e.preventDefault();
+      const email=document.getElementById("signupEmail").value,
+            pass=document.getElementById("signupPass").value,
+            role=document.getElementById("signupRole").value;
+      if(localStorage.getItem(email)){alert("Account already exists! Please login.");showLogin();return;}
+      localStorage.setItem(email,JSON.stringify({email,password:pass,role}));
+      alert("Signup successful! Please login now.");
+      showLogin();
+    });
+
+    loginForm.addEventListener("submit",(e)=>{
+      e.preventDefault();
+      const email=document.getElementById("loginEmail").value,
+            pass=document.getElementById("loginPass").value,
+            role=document.getElementById("loginRole").value;
+      const stored=localStorage.getItem(email);
+      if(!stored){alert("Account not found. Please sign up first.");showSignup();return;}
+      const user=JSON.parse(stored);
+      if(user.password!==pass){alert("Incorrect password!");return;}
+      if(user.role!==role){alert("Wrong role selected!");return;}
+      alert("Welcome back!");
+      if(role==="owner")window.location.href="owner-dashboard.html";
+      else window.location.href="renter-dashboard.html";
+    });
+  </script>
+</body>
+</html>
